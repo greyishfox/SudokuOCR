@@ -12,20 +12,21 @@ void OCR::getBoundingRect(cv::Mat trainingImage, cv::Mat thresholdImage, std::ve
 
     for(auto& el : cVector)
     {
-        if(cv::contourArea(el) >= 60 && cv::contourArea(el) < 280)
+        if(cv::contourArea(el) >= m_minContourArea && cv::contourArea(el) < m_maxContourArea)
         {
             redBoundingBox = cv::boundingRect(el);
             ++cntr;
             cv::rectangle(trainingImage, redBoundingBox, cv::Scalar(0,0,255), 2);
             roiImage = thresholdImage(redBoundingBox);
-            cv::resize(roiImage, resizedRoiImage, cv::Size(20,30)); // size(width, height)
+            cv::resize(roiImage, resizedRoiImage, cv::Size(m_cellWidth,m_cellHeight)); // size(width, height)
 
             cv::imshow("Region of interest: ", resizedRoiImage);
             cv::imshow("Training numbers: ", trainingImage);
 
-            std::cout << "Type in the number shown in the red rectangle: ";
+            // inputDigit captures char from user input
             inputDigit = cv::waitKey(0);
-            if(inputDigit>0 && inputDigit<10)
+            // We only allow single digit numbers as input (char --> '0' instead of 0 (int))
+            if(inputDigit >= '0' && inputDigit < '10')
             {
                 classificationInputDigits.push_back(inputDigit);
                 resizedRoiImage.convertTo(floatImage, CV_32FC1);
@@ -34,8 +35,6 @@ void OCR::getBoundingRect(cv::Mat trainingImage, cv::Mat thresholdImage, std::ve
             }
         }
     }
-
-
 }
 
 // Write classification input to file
@@ -68,8 +67,9 @@ void OCR::writeTrainedImageFile()
     fs_images.release();
 }
 
-int OCR::train(const cv::Mat labelTrain)
+std::vector<int> OCR::train(std::vector<cv::Mat> labelTrain)
 {
+
     // The classification data is read from the stored file
     // Once the classification and image files are created,
     // we do not need to create it everytime we run the program.
@@ -81,7 +81,9 @@ int OCR::train(const cv::Mat labelTrain)
     if(!fs_class.isOpened())
     {
         std::cout << "Error: File not found!" << std::endl;
-        return 0;
+        // Exit failure: abnormal termination of the program ...
+        // return 0 does not work since the function expects a vector of ints
+        exit(1);
     }
 
     // Write the file content into the class member image
@@ -94,7 +96,9 @@ int OCR::train(const cv::Mat labelTrain)
     if(!fs_images.isOpened())
     {
         std::cout << "Error: File not found!" << std::endl;
-        return 0;
+        // Exit failure: abnormal termination of the program ...
+        // return 0 does not work since the function expects a vector of ints
+        exit(1);
     }
 
     // Write the file content into the class member image
@@ -112,16 +116,17 @@ int OCR::train(const cv::Mat labelTrain)
     knearest->train(trainingImageOutput, cv::ml::ROW_SAMPLE , classificationInputDigits);
 
     // Prepare training image to be compatible with knearest
-    cv::Mat imageToPredictDigit = labelTrain.clone();
+    // TODO: Implement the label train of valid contours
+    //cv::Mat imageToPredictDigit = labelTrain.clone();
     cv::Mat flattenedImage;
     cv::Mat floatImage;
     cv::Mat knnResult;
-    imageToPredictDigit.convertTo(floatImage, CV_32FC1);
-    flattenedImage = floatImage.reshape(1, 1);
+    //imageToPredictDigit.convertTo(floatImage, CV_32FC1);
+    //flattenedImage = floatImage.reshape(1, 1);
 
     knearest->findNearest(flattenedImage, knearest->getDefaultK(), knnResult);
 
-    // extract digits from knnResult image
+    // TODO: extract digits from knnResult image
 
     delete knearest;
 }

@@ -1,4 +1,4 @@
-#include "imageprocessing.h"
+    #include "imageprocessing.h"
 
 cv::Mat ImageProcessing::imagePreprocessing(const cv::Mat sourceImage, const int thresholdType)
 {
@@ -86,7 +86,9 @@ cv::Mat ImageProcessing::getTopView(const cv::Mat sourceImage, std::vector<cv::P
 
 std::vector<cv::Mat> ImageProcessing::extractCells(cv::Mat thresholdImg)
 {
-    std::vector<cv::Mat> cell_images;
+    cv::Mat cellImg;
+    std::vector<cv::Mat> allCellImages;
+    std::vector<cv::Mat> cellImagesWithDigit;
     const int cell_width = thresholdImg.cols/9;
     const int cell_height = thresholdImg.rows/9;
     int x0, y0, x1, y1;
@@ -101,8 +103,16 @@ std::vector<cv::Mat> ImageProcessing::extractCells(cv::Mat thresholdImg)
             y0 = i*cell_height+10;
             y1 = cell_height-10;
             roi = cv::Rect(x0, y0, x1, y1);
-            cell_images.push_back(thresholdImg(roi));
+            cellImg = thresholdImg(roi);
+            allCellImages.push_back(cellImg);
+
+            // TODO: return only cell images with digits
+            // Define parameters for "findContour" function
+            std::vector<std::vector<cv::Point>> cVector;
+            std::vector<cv::Vec4i> hierarchy;
+            cv::Mat matCellImg = cellImg.clone();
+            cv::findContours(matCellImg, cVector, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
         }
     }
-    return cell_images;
+    return allCellImages;
 }
