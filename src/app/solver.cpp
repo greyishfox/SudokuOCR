@@ -18,7 +18,8 @@ bool Solver::rowChecker(std::vector<int> puzzle, const int row)
 
         // Test 2: Check if numbers are unique
         // sets only store unique values --> the size gives amount of unique values
-        if((std::set<int>(it, it+N).size()) == N)
+        // C++ style cast instead of C-style for better readability of code
+        if(static_cast<int>(std::set<int>(it, it+N).size()) == N)
             uniqueNum_flag = true;
     }
     else
@@ -49,7 +50,7 @@ bool Solver::colChecker(std::vector<int> puzzle, const int col)
 
         // Test 2: Check if numbers are unique
         it = validNum_vec.begin();
-        if((std::set<int>(it, it+N).size()) == N)
+        if(static_cast<int>(std::set<int>(it, it+N).size()) == N)
             uniqueNum_flag = true;
     }
     else
@@ -93,7 +94,7 @@ bool Solver::boxChecker(std::vector<int> puzzle, const int row, const int col)
             validNum_flag = true;
 
         // Test 2: Check if numbers are unique
-        if(std::set<int>(subSquare.begin(), subSquare.end()).size() == N)
+        if(static_cast<int>(std::set<int>(subSquare.begin(), subSquare.end()).size()) == N)
             uniqueNum_flag = true;
     }
 
