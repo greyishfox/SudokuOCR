@@ -37,6 +37,7 @@ void Widget::plotSolvImg()
     if(origImg.empty())
     {
         std::cout << "Error, Image not found!" << std::endl;
+        exit(1);
     }
     else
     {
@@ -54,6 +55,37 @@ void Widget::plotSolvImg()
         std::vector<cv::Mat> cellImages = imgProcess.extractCells(newThresholdImg);
 
         std::vector<cv::Mat> cellImagesWithDigit = imgProcess.selectCellsWithDigit(cellImages);
+
+        // If the classification and training files for kNearest do not exist, create them
+        if(!myOCR.checkIfFilesExists())
+        {
+            // Read the OCR trainig image
+            cv::Mat trainImg = cv::imread("OCR_training_set03.jpg");
+
+            if(trainImg.empty())
+            {
+                std::cout << "Error, Image not found!" << std::endl;
+                exit(1);
+            }
+
+            // Prepare parameters for the OCR digit assignment function (uses bounding box)
+            cv::Mat trainImgThreshold = imgProcess.imagePreprocessing(trainImg, cv::THRESH_BINARY);
+            cv::Mat trainImgContour = trainImgThreshold.clone();
+            std::vector<std::vector<cv::Point>> contourTrain;
+            std::vector<cv::Vec4i> hierarchy;
+            cv::findContours(trainImgContour, contourTrain, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+
+            // Assign an input key to the shown digits in the training image marked by the boundingbox
+            myOCR.getBoundingRect(trainImg, thresholdImg, contourTrain);
+
+            // Create classification and training files and store them in a predefined folder
+            myOCR.writeClassificationFile();
+            myOCR.writeTrainedImageFile();
+        }
+
+        // Run the training sequence for the kNearest
+        myOCR.train(cellImagesWithDigit);
+
 
         displaySolvImage = QImage((const unsigned char*) (topView.data),topView.cols,
                                   topView.rows, topView.step, QImage::Format_RGB888);

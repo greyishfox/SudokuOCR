@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "imageprocessing.h"
+#include "ocr.h"
 #include "solver.h"
 
 
@@ -30,5 +31,6 @@ private:
     QImage displaySolvImage;
 
     ImageProcessing imgProcess;
+    OCR myOCR;
 };
 #endif // WIDGET_H

@@ -23,7 +23,8 @@ public:
     void getBoundingRect(cv::Mat trainingImage, cv::Mat thresholdImage, std::vector<std::vector<cv::Point>> cVector);
     void writeClassificationFile();
     void writeTrainedImageFile();
-    std::vector<int> train(std::vector<cv::Mat> labelTrain);
+    bool checkIfFilesExists();
+    std::string train(std::vector<cv::Mat> labelTrain);
 };
 
 #endif // OCR_H

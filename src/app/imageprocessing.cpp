@@ -122,13 +122,15 @@ std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> 
        cv::findContours(cImg, cVector, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
        for(auto &el : cVector)
        {
-           std::cout << "Contour Area: " << cv::contourArea(el) << std::endl;
+           // std::cout << "Contour Area: " << cv::contourArea(el) << std::endl;
            if(cv::contourArea(el) > m_minContourArea && cv::contourArea(el) < m_maxContourArea)
            {
-                cellImagesWithDigit.push_back(cImg);
+                cv::Mat resizedCImg;
+                cv::resize(cImg, resizedCImg, cv::Size(m_CellWidth, m_CellHeight));
+                cellImagesWithDigit.push_back(resizedCImg);
                 // Check cell images:
-                cv::imshow("Cell image with digit: ", cImg);
-                cv::waitKey(0);
+                // cv::imshow("Cell image with digit: ", resizedCImg);
+                // cv::waitKey(0);
            }
        }
 

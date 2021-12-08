@@ -15,11 +15,10 @@ class ImageProcessing
 {
 private:
     // Holds contour of digit and coordinate in sudoku grid
-    std::multimap<std::vector<cv::Point>, cv::Rect> m_ROIdata;
     const int m_CellWidth = 20;
     const int m_CellHeight = 30;
     const int m_maxContourArea = 400;   // Initial value: 280
-    const int m_minContourArea = 75;
+    const int m_minContourArea = 75;    // Initial value: 60
 
 public:
     // ImageProcessing(); // Constructor not used
