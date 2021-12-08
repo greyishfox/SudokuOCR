@@ -86,9 +86,7 @@ cv::Mat ImageProcessing::getTopView(const cv::Mat sourceImage, std::vector<cv::P
 
 std::vector<cv::Mat> ImageProcessing::extractCells(cv::Mat thresholdImg)
 {
-    cv::Mat cellImg;
     std::vector<cv::Mat> allCellImages;
-    std::vector<cv::Mat> cellImagesWithDigit;
     const int cell_width = thresholdImg.cols/9;
     const int cell_height = thresholdImg.rows/9;
     int x0, y0, x1, y1;
@@ -103,16 +101,40 @@ std::vector<cv::Mat> ImageProcessing::extractCells(cv::Mat thresholdImg)
             y0 = i*cell_height+10;
             y1 = cell_height-10;
             roi = cv::Rect(x0, y0, x1, y1);
-            cellImg = thresholdImg(roi);
-            allCellImages.push_back(cellImg);
-
-            // TODO: return only cell images with digits
-            // Define parameters for "findContour" function
-            std::vector<std::vector<cv::Point>> cVector;
-            std::vector<cv::Vec4i> hierarchy;
-            cv::Mat matCellImg = cellImg.clone();
-            cv::findContours(matCellImg, cVector, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+            allCellImages.push_back(thresholdImg(roi));
         }
     }
     return allCellImages;
+}
+
+std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> cellImages)
+{
+    // TODO: return only cell images with digits
+    std::vector<cv::Mat> cellImagesWithDigit;
+    std::vector<cv::Point> contourInCell;
+
+    // Define parameters for "findContour" function
+    std::vector<std::vector<cv::Point>> cVector;
+    std::vector<cv::Vec4i> hierarchy;
+
+    std::for_each(cellImages.begin(), cellImages.end(), [&](cv::Mat cImg)
+    {
+       cv::findContours(cImg, cVector, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+       for(auto &el : cVector)
+       {
+           std::cout << "Contour Area: " << cv::contourArea(el) << std::endl;
+           if(cv::contourArea(el) > m_minContourArea && cv::contourArea(el) < m_maxContourArea)
+           {
+                cellImagesWithDigit.push_back(cImg);
+                // Check cell images:
+                cv::imshow("Cell image with digit: ", cImg);
+                cv::waitKey(0);
+           }
+       }
+
+       // Remove all contour elements from vector for next loop
+       cVector.clear();
+    });
+
+    return cellImagesWithDigit;
 }

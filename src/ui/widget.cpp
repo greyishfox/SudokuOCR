@@ -49,7 +49,11 @@ void Widget::plotSolvImg()
 
         cv::Mat topView = imgProcess.getTopView(origImg, frameCorners);
 
-        std::vector<cv::Mat> cellImages = imgProcess.extractCells(thresholdImg);
+        cv::Mat newThresholdImg = imgProcess.imagePreprocessing(topView, cv::THRESH_BINARY);
+
+        std::vector<cv::Mat> cellImages = imgProcess.extractCells(newThresholdImg);
+
+        std::vector<cv::Mat> cellImagesWithDigit = imgProcess.selectCellsWithDigit(cellImages);
 
         displaySolvImage = QImage((const unsigned char*) (topView.data),topView.cols,
                                   topView.rows, topView.step, QImage::Format_RGB888);

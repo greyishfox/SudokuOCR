@@ -18,8 +18,8 @@ private:
     std::multimap<std::vector<cv::Point>, cv::Rect> m_ROIdata;
     const int m_CellWidth = 20;
     const int m_CellHeight = 30;
-    const int m_maxContourArea = 280;
-    const int m_minContourArea = 60;
+    const int m_maxContourArea = 400;   // Initial value: 280
+    const int m_minContourArea = 75;
 
 public:
     // ImageProcessing(); // Constructor not used
@@ -33,6 +33,8 @@ public:
     cv::Mat getTopView(const cv::Mat sourceImage, std::vector<cv::Point> frameCorners);
 
     std::vector<cv::Mat> extractCells(cv::Mat thresholdImg);
+
+    std::vector<cv::Mat> selectCellsWithDigit(std::vector<cv::Mat> cellImages);
 };
 
 #endif // IMAGEPROCESSING_H
