@@ -17,13 +17,17 @@ private:
     // Holds contour of digit and coordinate in sudoku grid
     const int m_CellWidth = 20;
     const int m_CellHeight = 30;
-    const int m_maxContourArea = 400;   // Initial value: 280
-    const int m_minContourArea = 75;    // Initial value: 60
+    const int m_maxContourArea = 800;   // below this value we do not detect some digits
+    const int m_minContourArea = 150;    // below this value, one digit might be recognized as two
 
 public:
     // ImageProcessing(); // Constructor not used
     // Public member functions
     cv::Mat imagePreprocessing(const cv::Mat sourceImage, const int thresholdType);
+
+    cv::Mat preprocWithGauss(const cv::Mat sourceImage, const int thresholdType);
+
+    cv::Mat preprocWithGauss2(const cv::Mat sourceImage, const int thresholdType);
 
     std::vector<cv::Point> getFrameContour(cv::Mat thresholdImg);
 

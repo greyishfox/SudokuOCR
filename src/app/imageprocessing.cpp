@@ -16,6 +16,42 @@ cv::Mat ImageProcessing::imagePreprocessing(const cv::Mat sourceImage, const int
     return thresholdImg;
 }
 
+cv::Mat ImageProcessing::preprocWithGauss(const cv::Mat sourceImage, const int thresholdType)
+{
+    // Change image to greyscale
+    cv::Mat greyscale;
+    cv::cvtColor(sourceImage, greyscale, cv::COLOR_RGB2GRAY);
+    cv::Mat gaussBlurr;
+    cv::GaussianBlur(greyscale, gaussBlurr, cv::Size(5, 5), 0);
+    cv::Mat thresholdImg;
+    const double maxBinaryValue = 255;
+    cv::adaptiveThreshold(gaussBlurr, thresholdImg, maxBinaryValue,
+                          cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+                          thresholdType, 21, 1);
+    cv::imshow("Adaptive Thresh", thresholdImg);
+    cv::waitKey(0);
+
+    return thresholdImg;
+}
+
+cv::Mat ImageProcessing::preprocWithGauss2(const cv::Mat sourceImage, const int thresholdType)
+{
+    // Change image to greyscale
+    cv::Mat greyscale;
+    cv::cvtColor(sourceImage, greyscale, cv::COLOR_RGB2GRAY);
+    cv::Mat gaussBlurr;
+    cv::GaussianBlur(greyscale, gaussBlurr, cv::Size(5, 5), 1, 1);
+    cv::Mat thresholdImg;
+    const double maxBinaryValue = 255;
+    cv::adaptiveThreshold(gaussBlurr, thresholdImg, maxBinaryValue,
+                          cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+                          thresholdType, 57, 17); // 57, 17
+    cv::imshow("Adaptive Thresh", thresholdImg);
+    cv::waitKey(0);
+
+    return thresholdImg;
+}
+
 std::vector<cv::Point> ImageProcessing::getFrameContour(cv::Mat thresholdImg)
 {
     // Define parameters for "findContour" function
@@ -124,13 +160,15 @@ std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> 
        {
            // std::cout << "Contour Area: " << cv::contourArea(el) << std::endl;
            if(cv::contourArea(el) > m_minContourArea && cv::contourArea(el) < m_maxContourArea)
-           {
+           {               
+                cv::Rect boundingBox = cv::boundingRect(el);
+                cv::Mat roiImg = cImg(boundingBox);
                 cv::Mat resizedCImg;
-                cv::resize(cImg, resizedCImg, cv::Size(m_CellWidth, m_CellHeight));
+                cv::resize(roiImg, resizedCImg, cv::Size(m_CellWidth, m_CellHeight));
                 cellImagesWithDigit.push_back(resizedCImg);
                 // Check cell images:
-                // cv::imshow("Cell image with digit: ", resizedCImg);
-                // cv::waitKey(0);
+                cv::imshow("Cell image with digit: ", resizedCImg);
+                cv::waitKey(0);
            }
        }
 

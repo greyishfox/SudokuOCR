@@ -13,7 +13,7 @@ private:
     const std::string filename_trained = "../SudokuOCR/src/trainedImages.xml";
     const int m_cellWidth = 20;
     const int m_cellHeight = 30;
-    const int m_maxContourArea = 280;
+    const int m_maxContourArea = 1000;
     const int m_minContourArea = 60;
 
 public:

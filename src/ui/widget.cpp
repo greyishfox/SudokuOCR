@@ -50,8 +50,8 @@ void Widget::plotSolvImg()
 
         cv::Mat topView = imgProcess.getTopView(origImg, frameCorners);
 
-        cv::Mat newThresholdImg = imgProcess.imagePreprocessing(topView, cv::THRESH_BINARY);
-
+        //cv::Mat newThresholdImg = imgProcess.imagePreprocessing(topView, cv::THRESH_BINARY);
+        cv::Mat newThresholdImg = imgProcess.preprocWithGauss2(topView, cv::THRESH_BINARY_INV);
         std::vector<cv::Mat> cellImages = imgProcess.extractCells(newThresholdImg);
 
         std::vector<cv::Mat> cellImagesWithDigit = imgProcess.selectCellsWithDigit(cellImages);
@@ -69,7 +69,8 @@ void Widget::plotSolvImg()
             }
 
             // Prepare parameters for the OCR digit assignment function (uses bounding box)
-            cv::Mat trainImgThreshold = imgProcess.imagePreprocessing(trainImg, cv::THRESH_BINARY_INV);
+            //cv::Mat trainImgThreshold = imgProcess.imagePreprocessing(trainImg, cv::THRESH_BINARY_INV);
+            cv::Mat trainImgThreshold = imgProcess.preprocWithGauss(trainImg, cv::THRESH_BINARY_INV);
             cv::Mat trainImgContour = trainImgThreshold.clone();
             std::vector<std::vector<cv::Point>> contourTrain;
             std::vector<cv::Vec4i> hierarchy;
