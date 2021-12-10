@@ -60,23 +60,23 @@ void Widget::plotSolvImg()
         if(!myOCR.checkIfFilesExists())
         {
             // Read the OCR trainig image
-            cv::Mat trainImg = cv::imread("OCR_training_set03.jpg");
+            cv::Mat trainImg = cv::imread("OCR_training_digits.PNG");
 
             if(trainImg.empty())
             {
-                std::cout << "Error, Image not found!" << std::endl;
+                std::cout << "Error, OCR training set image not found!" << std::endl;
                 exit(1);
             }
 
             // Prepare parameters for the OCR digit assignment function (uses bounding box)
-            cv::Mat trainImgThreshold = imgProcess.imagePreprocessing(trainImg, cv::THRESH_BINARY);
+            cv::Mat trainImgThreshold = imgProcess.imagePreprocessing(trainImg, cv::THRESH_BINARY_INV);
             cv::Mat trainImgContour = trainImgThreshold.clone();
             std::vector<std::vector<cv::Point>> contourTrain;
             std::vector<cv::Vec4i> hierarchy;
             cv::findContours(trainImgContour, contourTrain, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
 
             // Assign an input key to the shown digits in the training image marked by the boundingbox
-            myOCR.getBoundingRect(trainImg, thresholdImg, contourTrain);
+            myOCR.getBoundingRect(trainImg, trainImgThreshold, contourTrain);
 
             // Create classification and training files and store them in a predefined folder
             myOCR.writeClassificationFile();
@@ -84,6 +84,7 @@ void Widget::plotSolvImg()
         }
 
         // Run the training sequence for the kNearest
+        std::cout << "Training kNearest..." << std::endl;
         myOCR.train(cellImagesWithDigit);
 
 

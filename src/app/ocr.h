@@ -9,8 +9,8 @@ class OCR
 private:
     cv::Mat classificationInputDigits;
     cv::Mat trainingImageOutput;
-    const std::string filename_class = "../SudokuSolver/src/classificationDigits.xml";
-    const std::string filename_trained = "../SudokuSolver/src/trainedImages.xml";
+    const std::string filename_class = "../SudokuOCR/src/classificationDigits.xml";
+    const std::string filename_trained = "../SudokuOCR/src/trainedImages.xml";
     const int m_cellWidth = 20;
     const int m_cellHeight = 30;
     const int m_maxContourArea = 280;
