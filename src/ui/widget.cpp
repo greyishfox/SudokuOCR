@@ -60,7 +60,7 @@ void Widget::plotSolvImg()
         if(!myOCR.checkIfFilesExists())
         {
             // Read the OCR trainig image
-            cv::Mat trainImg = cv::imread("OCR_training_digits.PNG");
+            cv::Mat trainImg = cv::imread("OCR_training_digits02.PNG");
 
             if(trainImg.empty())
             {

@@ -56,6 +56,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 # Add file
 FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/img/sudoku_sample_image.jpeg DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/img/OCR_training_digits.PNG DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/img/OCR_training_digits02.PNG DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Define required c++ standard to C++11
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)

@@ -144,51 +144,35 @@ std::string OCR::train(std::vector<cv::Mat> labelTrain)
     cv::Ptr<cv::ml::KNearest> knearest = cv::ml::KNearest::create();
 
     std::cout << "KNearest created...";
+
     // Set properties of KNearest
     knearest->setIsClassifier(true);
     knearest->setAlgorithmType(cv::ml::KNearest::Types::BRUTE_FORCE);
     knearest->setDefaultK(1);
 
-    std::cout << "Training KNN..." << std::endl;
-    std::cout << "TrainingImage Dimension: (" << trainingImg.rows << "," <<
-                 trainingImg.cols << ")" << std::endl;
-    std::cout << "ClassificationDigits Dimension: (" << classificationImg.rows << "," <<
-                 classificationImg.cols << ")" << std::endl;
+    // Checks the matrix shape (rows, cols)
+    // std::cout << "TrainingImage Dimension: (" << trainingImg.rows << "," <<
+    //              trainingImg.cols << ")" << std::endl;
+    // std::cout << "ClassificationDigits Dimension: (" << classificationImg.rows << "," <<
+    //              classificationImg.cols << ")" << std::endl;
+
+    // Train the knn algorithm
     knearest->train(trainingImg, cv::ml::ROW_SAMPLE, classificationImg);
 
-    std::cout << "...trained." << std::endl;
-    // TODO: extract digits from knnResult image
+    // Store the trained model
+    knearest->save("../SudokuOCR/src/knn.yml");
+
     // This string holds the resulting numbers
     std::string detectedDigits;
 
-    for(int i = 0; i < labelTrain.size(); i++)
-    {
-        // cv::imshow("images", labelTrain[i]);
-        // cv::waitKey(0);
-        // Prepare training image to be compatible with knearest
-        // 1.) Convert to float
-        cv::Mat floatCellImage;
-        labelTrain[i].convertTo(floatCellImage, CV_32FC1);
-        // 2.) Reshape or flatten respectively
-        cv::Mat flattenedCellImage;
-        flattenedCellImage = floatCellImage.reshape(1, 1);
-
-        // Evaluate the digit by calling kNearest
-        cv::Mat knnResult;
-        // std::cout << "Searching nearest neighbour..." << std::endl;
-        float digit = knearest->findNearest(flattenedCellImage, knearest->getDefaultK(), knnResult);
-        // std::cout << "...nearest neighbour found!" << std::endl;
-        std::cout << "Digit: " << digit << std::endl;
-        // Convert float to string
-        detectedDigits += char(int(digit));
-    };
-
-//    std::for_each(labelTrain.begin(), labelTrain.end(), [&](cv::Mat cImg)
+//    for(int i = 0; i < labelTrain.size(); i++)
 //    {
+//        // cv::imshow("images", labelTrain[i]);
+//        // cv::waitKey(0);
 //        // Prepare training image to be compatible with knearest
 //        // 1.) Convert to float
 //        cv::Mat floatCellImage;
-//        cImg.convertTo(floatCellImage, CV_32FC1);
+//        labelTrain[i].convertTo(floatCellImage, CV_32FC1);
 //        // 2.) Reshape or flatten respectively
 //        cv::Mat flattenedCellImage;
 //        flattenedCellImage = floatCellImage.reshape(1, 1);
@@ -196,24 +180,31 @@ std::string OCR::train(std::vector<cv::Mat> labelTrain)
 //        // Evaluate the digit by calling kNearest
 //        cv::Mat knnResult;
 //        // std::cout << "Searching nearest neighbour..." << std::endl;
-//        float digit = knearest->findNearest(flattenedCellImage, 9, knnResult);
+//        float digit = knearest->findNearest(flattenedCellImage, knearest->getDefaultK(), knnResult);
 //        // std::cout << "...nearest neighbour found!" << std::endl;
 //        std::cout << "Digit: " << digit << std::endl;
 //        // Convert float to string
 //        detectedDigits += char(int(digit));
-//    });
+//    };
 
+    std::for_each(labelTrain.begin(), labelTrain.end(), [&](cv::Mat cImg)
+    {
+        // Prepare training image to be compatible with knearest
+        // 1.) Convert to float
+        cv::Mat floatCellImage;
+        cImg.convertTo(floatCellImage, CV_32FC1);
 
+        // 2.) Reshape or flatten respectively
+        cv::Mat flattenedCellImage;
+        flattenedCellImage = floatCellImage.reshape(1, 1);
 
-    //cv::Mat imageToPredictDigit = labelTrain.clone();
+        // Evaluate the digit by calling kNearest
+        cv::Mat knnResult;
+        float digit = knearest->findNearest(flattenedCellImage, knearest->getDefaultK(), knnResult);
 
-    //imageToPredictDigit.convertTo(floatImage, CV_32FC1);
-    //flattenedImage = floatImage.reshape(1, 1, 1);
-
-    //float floatDigit = knearest->findNearest(flattenedImage, knearest->getDefaultK(), knnResult);
-
-    // Make sure to delete the object pointer to avoid a memory leak!
-    // delete knearest;
+        // Convert float to string
+        detectedDigits += char(int(digit));
+    });
 
     // Return a string of the detected images
     std::cout << "The detected digits are: " << detectedDigits << std::endl;
