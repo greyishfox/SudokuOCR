@@ -1,4 +1,4 @@
-    #include "imageprocessing.h"
+#include "imageprocessing.h"
 
 cv::Mat ImageProcessing::imagePreprocessing(const cv::Mat sourceImage, const int thresholdType)
 {
@@ -46,8 +46,8 @@ cv::Mat ImageProcessing::preprocWithGauss2(const cv::Mat sourceImage, const int 
     cv::adaptiveThreshold(gaussBlurr, thresholdImg, maxBinaryValue,
                           cv::ADAPTIVE_THRESH_GAUSSIAN_C,
                           thresholdType, 57, 17); // 57, 17
-    cv::imshow("Adaptive Thresh", thresholdImg);
-    cv::waitKey(0);
+    // cv::imshow("Adaptive Thresh", thresholdImg);
+    // cv::waitKey(0);
 
     return thresholdImg;
 }
@@ -194,4 +194,40 @@ std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> 
 std::vector<bool> ImageProcessing::getCellsWithNumbers(void)
 {
     return cellsWithNumbers;
+}
+
+void ImageProcessing::drawMissingDigits(cv::Mat topViewImage, const std::vector<bool> cellWithDigit, std::vector<int> sudoku)
+{
+    // Calculate digit coordinate for varying digit sizes
+    const double fontSize = 1.4;
+    const int xCoord = 12 - (fontSize - 1.6) * 10;
+    const int yCoord = 46 + (fontSize - 1.6) * 10;
+    int newXcoord = 0;
+    int newYcoord = 0;
+    int colCounter = 0;
+    int rowCounter = 0;
+
+    // Transform vector of int to vector of string
+    std::vector<std::string> missingDigits;
+    std::transform(sudoku.begin(), sudoku.end(), std::back_inserter(missingDigits),
+                   [](int digit){return std::to_string(digit);});
+
+    std::vector<std::string>::iterator itr = missingDigits.begin();
+    // Draw the missing numbers to image
+    std::for_each(cellWithDigit.begin(), cellWithDigit.end(), [&](bool cellContent){
+        if(cellContent == false)
+        {
+            newXcoord = xCoord + (colCounter * static_cast<float>(topViewImage.cols)/9);
+            newYcoord = yCoord + (rowCounter * static_cast<float>(topViewImage.rows)/9);
+            cv::putText(topViewImage, *itr, cv::Point(newXcoord,newYcoord), cv::FONT_HERSHEY_DUPLEX, fontSize, cv::Scalar(0,0,255), 2);
+        }
+
+        if(colCounter == 8)
+        {
+            colCounter = -1;
+            rowCounter++;
+        }
+        ++colCounter;
+        ++itr;
+    });
 }

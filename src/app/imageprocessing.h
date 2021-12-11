@@ -20,6 +20,7 @@ private:
     const int m_maxContourArea = 800;   // below this value we do not detect some digits
     const int m_minContourArea = 150;   // below this value, one digit might be recognized as two
     std::vector<bool> cellsWithNumbers; // Assigns 'true' for digit and 'false' for emtpy cell
+    //std::vector<cv::Point> digitCoordinates; // Stores cell coordinates of missing numbers
 
 public:
     // ImageProcessing(); // Constructor not used
@@ -41,6 +42,8 @@ public:
     std::vector<cv::Mat> selectCellsWithDigit(std::vector<cv::Mat> cellImages);
 
     std::vector<bool> getCellsWithNumbers(void);
+
+    void drawMissingDigits(cv::Mat topViewImage, const std::vector<bool> cellWithDigit, std::vector<int> sudoku);
 };
 
 #endif // IMAGEPROCESSING_H

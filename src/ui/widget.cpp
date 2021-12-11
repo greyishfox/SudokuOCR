@@ -120,6 +120,8 @@ void Widget::plotSolvImg()
         // Print the elapsed time
         std::cout << "Time elapsed: " << (finish - start).count()*1e-9 << "s" << std::endl;
 
+        imgProcess.drawMissingDigits(topView, imgProcess.getCellsWithNumbers(), puzzleToSolve);
+
         // Print solved Sudoku image
         displaySolvImage = QImage((const unsigned char*) (topView.data),topView.cols,
                                   topView.rows, topView.step, QImage::Format_RGB888);
