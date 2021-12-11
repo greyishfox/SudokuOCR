@@ -34,6 +34,9 @@ void Widget::plotOrigImg()
 
 void Widget::plotSolvImg()
 {
+    // Get time at solver start
+    auto start = std::chrono::high_resolution_clock::now();
+
     if(origImg.empty())
     {
         std::cout << "Error, Image not found!" << std::endl;
@@ -91,14 +94,11 @@ void Widget::plotSolvImg()
 
         mysolver.printSudoku(puzzleToSolve);
 
+        // -------------------- Solve the sudoku puzzle -------------------- //
+
         // Initial position to start the solving algorithm
         int row = 0;
         int col = 0;
-
-        // -------------------- Solve the sudoku puzzle -------------------- //
-
-        // Get time at solver start
-        auto start = std::chrono::high_resolution_clock::now();
 
         // Perform the algorithm
         if(mysolver.solve(puzzleToSolve, row, col))
@@ -114,12 +114,6 @@ void Widget::plotSolvImg()
         else
             std::cout << "Error: Sudoku cannot be solved" << std::endl;
 
-        // Get time at solver ending
-        auto finish = std::chrono::high_resolution_clock::now();
-
-        // Print the elapsed time
-        std::cout << "Time elapsed: " << (finish - start).count()*1e-9 << "s" << std::endl;
-
         imgProcess.drawMissingDigits(topView, imgProcess.getCellsWithNumbers(), puzzleToSolve);
 
         // Print solved Sudoku image
@@ -127,6 +121,12 @@ void Widget::plotSolvImg()
                                   topView.rows, topView.step, QImage::Format_RGB888);
         ui->lbl_solvImg->setPixmap(QPixmap::fromImage(displaySolvImage));
     }
+
+    // Get time at solver ending
+    auto finish = std::chrono::high_resolution_clock::now();
+
+    // Print the elapsed time
+    std::cout << "Time elapsed: " << (finish - start).count()*1e-9 << "s" << std::endl;
 }
 
 
