@@ -84,11 +84,43 @@ void Widget::plotSolvImg()
             myOCR.writeTrainedImageFile();
         }
 
-        // Run the training sequence for the kNearest
-        std::cout << "Training kNearest..." << std::endl;
-        myOCR.train(cellImagesWithDigit);
+        // Run the training sequence for the kNearest       
+        std::string digits = myOCR.train(cellImagesWithDigit);
 
+        std::vector<int> puzzleToSolve = mysolver.createSudokuPuzzle(imgProcess.getCellsWithNumbers(), digits);
 
+        mysolver.printSudoku(puzzleToSolve);
+
+        // Initial position to start the solving algorithm
+        int row = 0;
+        int col = 0;
+
+        // -------------------- Solve the sudoku puzzle -------------------- //
+
+        // Get time at solver start
+        auto start = std::chrono::high_resolution_clock::now();
+
+        // Perform the algorithm
+        if(mysolver.solve(puzzleToSolve, row, col))
+        {
+            if(mysolver.checker(puzzleToSolve, row, col))
+            {
+                mysolver.printSudoku(puzzleToSolve);
+                std::cout << "Congratulations, you solved the sudoku puzzle!" << std::endl;
+            }
+            else
+                std::cout << "Error: Backtracking leads to a wrong result" << std::endl;
+        }
+        else
+            std::cout << "Error: Sudoku cannot be solved" << std::endl;
+
+        // Get time at solver ending
+        auto finish = std::chrono::high_resolution_clock::now();
+
+        // Print the elapsed time
+        std::cout << "Time elapsed: " << (finish - start).count()*1e-9 << "s" << std::endl;
+
+        // Print solved Sudoku image
         displaySolvImage = QImage((const unsigned char*) (topView.data),topView.cols,
                                   topView.rows, topView.step, QImage::Format_RGB888);
         ui->lbl_solvImg->setPixmap(QPixmap::fromImage(displaySolvImage));

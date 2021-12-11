@@ -147,14 +147,16 @@ std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> 
 {
     // TODO: return only cell images with digits
     std::vector<cv::Mat> cellImagesWithDigit;
+    int cellCntr = 0;
     std::vector<cv::Point> contourInCell;
 
     // Define parameters for "findContour" function
     std::vector<std::vector<cv::Point>> cVector;
-    std::vector<cv::Vec4i> hierarchy;
+    //std::vector<cv::Vec4i> hierarchy;
 
     std::for_each(cellImages.begin(), cellImages.end(), [&](cv::Mat cImg)
     {
+       int tmp = cellCntr;
        cv::findContours(cImg, cVector, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
        for(auto &el : cVector)
        {
@@ -167,14 +169,29 @@ std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> 
                 cv::resize(roiImg, resizedCImg, cv::Size(m_CellWidth, m_CellHeight));
                 cellImagesWithDigit.push_back(resizedCImg);
                 // Check cell images:
-                cv::imshow("Cell image with digit: ", resizedCImg);
-                cv::waitKey(0);
+                // cv::imshow("Cell image with digit: ", resizedCImg);
+                // cv::waitKey(0);
+                cellsWithNumbers.push_back(true);
+                cellCntr++;
            }
        }
-
+       if(cellCntr > tmp)
+           tmp = cellCntr;
+       else
+           cellsWithNumbers.push_back(false);
        // Remove all contour elements from vector for next loop
        cVector.clear();
     });
 
+    for(auto el : cellsWithNumbers){
+        std::cout << el << " ";
+    }
+    std::cout << std::endl;
+
     return cellImagesWithDigit;
+}
+
+std::vector<bool> ImageProcessing::getCellsWithNumbers(void)
+{
+    return cellsWithNumbers;
 }

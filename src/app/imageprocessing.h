@@ -18,7 +18,8 @@ private:
     const int m_CellWidth = 20;
     const int m_CellHeight = 30;
     const int m_maxContourArea = 800;   // below this value we do not detect some digits
-    const int m_minContourArea = 150;    // below this value, one digit might be recognized as two
+    const int m_minContourArea = 150;   // below this value, one digit might be recognized as two
+    std::vector<bool> cellsWithNumbers; // Assigns 'true' for digit and 'false' for emtpy cell
 
 public:
     // ImageProcessing(); // Constructor not used
@@ -38,6 +39,8 @@ public:
     std::vector<cv::Mat> extractCells(cv::Mat thresholdImg);
 
     std::vector<cv::Mat> selectCellsWithDigit(std::vector<cv::Mat> cellImages);
+
+    std::vector<bool> getCellsWithNumbers(void);
 };
 
 #endif // IMAGEPROCESSING_H

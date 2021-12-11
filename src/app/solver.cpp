@@ -182,6 +182,33 @@ bool Solver::findNextEmptyCell(std::vector<int> puzzle, int &row, int &col)
     return false;
 }
 
+// Create the sudoku puzzle with the found digits
+std::vector<int> Solver::createSudokuPuzzle(const std::vector<bool> cellWithDigit, const std::string detectedDigits)
+{
+    std::vector<int> sudokuPuzzle;
+    std::vector<int> digits;
+
+    // Convert the string to an int vector
+    for(const auto& el : detectedDigits)
+    {
+        digits.push_back(el - '0');
+    }
+    std::vector<int>::iterator itr = digits.begin();
+
+    // If the current cell has asigned true enter the digit,
+    std::for_each(cellWithDigit.begin(), cellWithDigit.end(), [&](bool cellContent){
+        if(cellContent == true)
+        {
+            sudokuPuzzle.push_back(*itr);
+            ++itr;
+        }
+        else
+            sudokuPuzzle.push_back(0);
+    });
+
+    return sudokuPuzzle;
+}
+
 // Performs backtracking (common algorithm for sudoku solving)
 bool Solver::solve(std::vector<int> &puzzle, int row, int col)
 {

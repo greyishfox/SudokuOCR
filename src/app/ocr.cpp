@@ -165,28 +165,7 @@ std::string OCR::train(std::vector<cv::Mat> labelTrain)
     // This string holds the resulting numbers
     std::string detectedDigits;
 
-//    for(int i = 0; i < labelTrain.size(); i++)
-//    {
-//        // cv::imshow("images", labelTrain[i]);
-//        // cv::waitKey(0);
-//        // Prepare training image to be compatible with knearest
-//        // 1.) Convert to float
-//        cv::Mat floatCellImage;
-//        labelTrain[i].convertTo(floatCellImage, CV_32FC1);
-//        // 2.) Reshape or flatten respectively
-//        cv::Mat flattenedCellImage;
-//        flattenedCellImage = floatCellImage.reshape(1, 1);
-
-//        // Evaluate the digit by calling kNearest
-//        cv::Mat knnResult;
-//        // std::cout << "Searching nearest neighbour..." << std::endl;
-//        float digit = knearest->findNearest(flattenedCellImage, knearest->getDefaultK(), knnResult);
-//        // std::cout << "...nearest neighbour found!" << std::endl;
-//        std::cout << "Digit: " << digit << std::endl;
-//        // Convert float to string
-//        detectedDigits += char(int(digit));
-//    };
-
+    // Find the knearest neighbour for every image of the sudoku cells
     std::for_each(labelTrain.begin(), labelTrain.end(), [&](cv::Mat cImg)
     {
         // Prepare training image to be compatible with knearest

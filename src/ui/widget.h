@@ -32,5 +32,6 @@ private:
 
     ImageProcessing imgProcess;
     OCR myOCR;
+    Solver mysolver;
 };
 #endif // WIDGET_H
