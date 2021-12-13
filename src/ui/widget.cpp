@@ -19,10 +19,24 @@ Widget::~Widget()
 
 void Widget::plotOrigImg()
 {
-    origImg = cv::imread("sudoku_sample_image.jpeg");
+    // Read in the image which is selected in the combo box
+    std::cout << ui->comboBox->currentText().toStdString() << std::endl;
+    if(ui->comboBox->currentText().toStdString() == "Sudoku Puzzle 01")
+        origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image1.jpg");
+    else if(ui->comboBox->currentText().toStdString() == "Sudoku Puzzle 02")
+        origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image2.jpg");
+    else if(ui->comboBox->currentText().toStdString() == "Sudoku Puzzle 03")
+        origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image3.jpg");
+    else if(ui->comboBox->currentText().toStdString() == "Sudoku Puzzle 04")
+        origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image4.jpg");
+    else if(ui->comboBox->currentText().toStdString() == "Worlds Hardest Sudoku")
+        origImg = cv::imread("../SudokuOCR/img/worldsHardestSudoku.png");
+
+    // Check if image was successfully loaded
     if(origImg.empty())
     {
         std::cout << "Error, Image not found!" << std::endl;
+        exit(1);
     }
     else
     {
@@ -46,7 +60,6 @@ void Widget::plotSolvImg()
     else
     {
         cv::Mat thresholdImg = imgProcess.imagePreprocessing(origImg, cv::THRESH_BINARY_INV);
-        //cv::imshow("Threshold", thresholdImg);
 
         std::vector<cv::Point> frameContour = imgProcess.getFrameContour(thresholdImg);
 
@@ -54,7 +67,6 @@ void Widget::plotSolvImg()
 
         cv::Mat topView = imgProcess.getTopView(origImg, frameCorners);
 
-        //cv::Mat newThresholdImg = imgProcess.imagePreprocessing(topView, cv::THRESH_BINARY);
         cv::Mat newThresholdImg = imgProcess.preprocWithGauss2(topView, cv::THRESH_BINARY_INV);
         std::vector<cv::Mat> cellImages = imgProcess.extractCells(newThresholdImg);
 
@@ -73,7 +85,6 @@ void Widget::plotSolvImg()
             }
 
             // Prepare parameters for the OCR digit assignment function (uses bounding box)
-            //cv::Mat trainImgThreshold = imgProcess.imagePreprocessing(trainImg, cv::THRESH_BINARY_INV);
             cv::Mat trainImgThreshold = imgProcess.preprocWithGauss(trainImg, cv::THRESH_BINARY_INV);
             cv::Mat trainImgContour = trainImgThreshold.clone();
             std::vector<std::vector<cv::Point>> contourTrain;

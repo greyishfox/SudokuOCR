@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>987</width>
-    <height>731</height>
+    <width>1050</width>
+    <height>781</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>550</y>
-     <width>971</width>
+     <width>1031</width>
      <height>81</height>
     </rect>
    </property>
@@ -56,7 +56,7 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>971</width>
+     <width>1031</width>
      <height>514</height>
     </rect>
    </property>
@@ -94,7 +94,7 @@
     <rect>
      <x>10</x>
      <y>640</y>
-     <width>971</width>
+     <width>1031</width>
      <height>80</height>
     </rect>
    </property>
@@ -113,6 +113,36 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QComboBox" name="comboBox">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>740</y>
+     <width>191</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Sudoku Puzzle 01</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Sudoku Puzzle 02</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Sudoku Puzzle 03</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Worlds Hardest Sudoku</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>

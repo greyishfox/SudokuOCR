@@ -12,6 +12,10 @@ cv::Mat ImageProcessing::imagePreprocessing(const cv::Mat sourceImage, const int
     const double maxBinaryValue = 255;
     cv::threshold(greyscale, thresholdImg, thresholdValue, maxBinaryValue, thresholdType);
 
+    // Plot threshold image
+    cv::imshow("Threshold image", thresholdImg);
+    cv::waitKey(0);
+
     // Return a treshold version of the original image
     return thresholdImg;
 }
@@ -21,8 +25,10 @@ cv::Mat ImageProcessing::preprocWithGauss(const cv::Mat sourceImage, const int t
     // Change image to greyscale
     cv::Mat greyscale;
     cv::cvtColor(sourceImage, greyscale, cv::COLOR_RGB2GRAY);
+
     cv::Mat gaussBlurr;
     cv::GaussianBlur(greyscale, gaussBlurr, cv::Size(5, 5), 0);
+
     cv::Mat thresholdImg;
     const double maxBinaryValue = 255;
     cv::adaptiveThreshold(gaussBlurr, thresholdImg, maxBinaryValue,
@@ -46,6 +52,8 @@ cv::Mat ImageProcessing::preprocWithGauss2(const cv::Mat sourceImage, const int 
     cv::adaptiveThreshold(gaussBlurr, thresholdImg, maxBinaryValue,
                           cv::ADAPTIVE_THRESH_GAUSSIAN_C,
                           thresholdType, 57, 17); // 57, 17
+
+    // Plot adaptive threshold image
     // cv::imshow("Adaptive Thresh", thresholdImg);
     // cv::waitKey(0);
 
@@ -59,7 +67,7 @@ std::vector<cv::Point> ImageProcessing::getFrameContour(cv::Mat thresholdImg)
     std::vector<cv::Vec4i> hierarchy;
 
     // Detect contours
-    cv::findContours(thresholdImg, cVector, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(thresholdImg, cVector, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);    
 
     // The largest contour area found in the image should be the frame of the sudoku
     double largest_area = 0;
@@ -90,10 +98,12 @@ std::vector<cv::Point> ImageProcessing::findFrameCorners(cv::Mat sourceImage, st
     if(polygon.size() == 4)
     {
         std::cout << "Frame corners found!" << std::endl;
-        // cv::Mat poly_img = sourceImage.clone();
-        // cv::drawContours(poly_img, cv::Mat(polygon), -1, cv::Scalar(0, 0, 255), 3, 8);
-        // cv::imshow("Corner image", poly_img);
-        // waitKey(0);
+
+        // Plot grid corners
+        cv::Mat poly_img = sourceImage.clone();
+        cv::drawContours(poly_img, cv::Mat(polygon), -1, cv::Scalar(0, 0, 255), 3, 8);
+        cv::imshow("Corner image", poly_img);
+        cv::waitKey(0);
     }
     else
         std::cout << "Error: Contour has more than 4 corners!" << std::endl;
@@ -109,9 +119,10 @@ cv::Mat ImageProcessing::getTopView(const cv::Mat sourceImage, std::vector<cv::P
     const int imHeight = sourceImage.cols;
 
     // Define a vector holding the corners of the original image
-    std::vector<cv::Point> imDimension = {cv::Point(imWidth,0), cv::Point(0,0),
-                                          cv::Point(0, imHeight), cv::Point(imWidth, imHeight)};
-
+    //std::vector<cv::Point> imDimension = {cv::Point(imWidth,0), cv::Point(0,0),
+                                          //cv::Point(0, imHeight), cv::Point(imWidth, imHeight)};
+    std::vector<cv::Point> imDimension = {cv::Point(0,0), cv::Point(0,imHeight),
+                                          cv::Point(imWidth, imHeight), cv::Point(imWidth, 0)};
     // Apply perspective transform
     cv::Mat perspective = cv::findHomography(frameCorners, imDimension, cv::RANSAC);
     cv::Mat topViewImage;
