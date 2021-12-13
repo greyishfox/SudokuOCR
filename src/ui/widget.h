@@ -2,6 +2,11 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <QDateTime>
+#include <QDebug>
 #include "imageprocessing.h"
 #include "ocr.h"
 #include "solver.h"
@@ -22,11 +27,12 @@ public:
 public slots:
     void plotOrigImg();
     void plotSolvImg();
-    // void saveImg();
+    void saveImg();
 
 private:
     Ui::Widget *ui;
     cv::Mat origImg;
+    cv::Mat solvedImg;
     QImage displayOrigImage;
     QImage displaySolvImage;
 

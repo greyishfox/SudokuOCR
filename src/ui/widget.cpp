@@ -9,6 +9,7 @@ Widget::Widget(QWidget *parent)
     this->setWindowTitle("Soduku Solver");
     connect(ui->btn_showImage, SIGNAL(clicked()), this, SLOT(plotOrigImg()));
     connect(ui->btn_solution, SIGNAL(clicked()), this, SLOT(plotSolvImg()));
+    connect(ui->btn_save, SIGNAL(clicked()), this, SLOT(saveImg()));
 }
 
 Widget::~Widget()
@@ -120,6 +121,8 @@ void Widget::plotSolvImg()
         displaySolvImage = QImage((const unsigned char*) (topView.data),topView.cols,
                                   topView.rows, topView.step, QImage::Format_RGB888);
         ui->lbl_solvImg->setPixmap(QPixmap::fromImage(displaySolvImage));
+
+        solvedImg = topView.clone();
     }
 
     // Get time at solver ending
@@ -127,6 +130,37 @@ void Widget::plotSolvImg()
 
     // Print the elapsed time
     std::cout << "Time elapsed: " << (finish - start).count()*1e-9 << "s" << std::endl;
+}
+
+void Widget::saveImg()
+{
+    if(solvedImg.empty())
+    {
+        std::cout << "Error, Image not found!" << std::endl;
+        exit(1);
+    }
+
+    // Prepair variables to hold parts of the save file name
+    QString saveDir = "../SudokuOCR/img/SolvedSudokuImages/";
+    QString fileName = "_Sudoku.jpg";
+    QString saveFileName;
+
+    // Get current time and date and store it in a QString
+    QDateTime local(QDateTime::currentDateTime());
+    QString timeStamp = local.date().toString() + local.time().toString();
+
+    // Replace unnecessary characters
+    std::vector<std::pair<QString, QString>> replace{{ ":", "-" },{ ".", "" },{ " ", "-" }};
+    for(auto& el : replace)
+    {
+        timeStamp.replace(el.first, el.second);
+    }
+
+    // Check concatenated file name
+    saveFileName = saveDir + timeStamp + fileName;
+    qDebug() << "Save file name is: " << saveFileName;
+
+    cv::imwrite(saveFileName.toStdString(), solvedImg);
 }
 
 
