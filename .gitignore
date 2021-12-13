@@ -20,6 +20,11 @@
 *.mod
 *.smod
 
+# Images
+*.jpg
+*.jpeg
+*.png
+
 # Compiled Static libraries
 *.lai
 *.la
