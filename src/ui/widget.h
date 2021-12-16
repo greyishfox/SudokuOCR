@@ -28,6 +28,7 @@ public slots:
     void plotOrigImg();
     void plotSolvImg();
     void saveImg();
+    void reset();
 
 private:
     Ui::Widget *ui;

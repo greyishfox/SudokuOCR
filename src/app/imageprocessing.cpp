@@ -1,5 +1,15 @@
 #include "imageprocessing.h"
 
+ImageProcessing::ImageProcessing()
+{
+
+}
+
+ImageProcessing::~ImageProcessing()
+{
+
+}
+
 cv::Mat ImageProcessing::imagePreprocessing(const cv::Mat sourceImage, const int thresholdType)
 {
     // Change image to greyscale

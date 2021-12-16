@@ -1,5 +1,8 @@
 #include "solver.h"
 
+Solver::Solver(){}
+
+Solver::~Solver(){}
 
 // Checks validity of given row
 bool Solver::rowChecker(std::vector<int> puzzle, const int row)

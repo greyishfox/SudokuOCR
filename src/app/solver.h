@@ -24,12 +24,13 @@ private:
     bool findNextEmptyCell(std::vector<int> puzzle, int& row, int &col);
 
 public:
-    // Solver(); // Note: no constructor needed
+    Solver();   // Constructor
+    ~Solver();  // Destructor
+
     bool checker(const std::vector<int> puzzle, const int row, const int col);
     bool solve(std::vector<int>& puzzle, int row, int col);
     void printSudoku(std::vector<int> sudoku);
     std::vector<int> createSudokuPuzzle(const std::vector<bool> cellWithDigit, const std::string detectedDigits);
-
 };
 
 #endif // SOLVER_H

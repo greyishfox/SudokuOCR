@@ -23,7 +23,9 @@ private:
     //std::vector<cv::Point> digitCoordinates; // Stores cell coordinates of missing numbers
 
 public:
-    // ImageProcessing(); // Constructor not used
+    ImageProcessing(); // Constructor
+    ~ImageProcessing(); // Destructor
+
     // Public member functions
     cv::Mat imagePreprocessing(const cv::Mat sourceImage, const int thresholdType);
 

@@ -10,6 +10,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->btn_showImage, SIGNAL(clicked()), this, SLOT(plotOrigImg()));
     connect(ui->btn_solution, SIGNAL(clicked()), this, SLOT(plotSolvImg()));
     connect(ui->btn_save, SIGNAL(clicked()), this, SLOT(saveImg()));
+    connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(reset()));
 }
 
 Widget::~Widget()
@@ -174,5 +175,21 @@ void Widget::saveImg()
     cv::imwrite(saveFileName.toStdString(), solvedImg);
 }
 
+void Widget::reset()
+{
+    // Reset member variables and clear labels
+    origImg.release();
+    solvedImg.release();
+    displayOrigImage = QImage();
+    displaySolvImage = QImage();
+    ui->lbl_origImg->clear();
+    ui->lbl_solvImg->clear();
 
+    // Reset image processing object
+    (&imgProcess)->~ImageProcessing();
+    new (&imgProcess) ImageProcessing();
 
+    // Reset solver object
+    (&mysolver)->~Solver();
+    new (&mysolver) Solver();
+}
