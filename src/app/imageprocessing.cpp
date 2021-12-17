@@ -1,15 +1,11 @@
 #include "imageprocessing.h"
 
-ImageProcessing::ImageProcessing()
-{
+// Constructor
+ImageProcessing::ImageProcessing(){}
+// Destructor
+ImageProcessing::~ImageProcessing(){}
 
-}
-
-ImageProcessing::~ImageProcessing()
-{
-
-}
-
+// Preprocessing for original image (Key feature: Outer contour of sudoku)
 cv::Mat ImageProcessing::imagePreprocessing(const cv::Mat sourceImage, const int thresholdType)
 {
     // Change image to greyscale
@@ -30,39 +26,50 @@ cv::Mat ImageProcessing::imagePreprocessing(const cv::Mat sourceImage, const int
     return thresholdImg;
 }
 
-cv::Mat ImageProcessing::preprocWithGauss(const cv::Mat sourceImage, const int thresholdType)
+// Preprocessing for transformed topview image (Key feature: Sudoku cells with numbers)
+cv::Mat ImageProcessing::preprocWithGauss(const cv::Mat topView, const int thresholdType)
 {
     // Change image to greyscale
     cv::Mat greyscale;
-    cv::cvtColor(sourceImage, greyscale, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(topView, greyscale, cv::COLOR_RGB2GRAY);
 
+    // Apply gaussian blurr (reduce noise)
     cv::Mat gaussBlurr;
     cv::GaussianBlur(greyscale, gaussBlurr, cv::Size(5, 5), 0);
 
+    // Apply adaptive threshold
     cv::Mat thresholdImg;
     const double maxBinaryValue = 255;
     cv::adaptiveThreshold(gaussBlurr, thresholdImg, maxBinaryValue,
                           cv::ADAPTIVE_THRESH_GAUSSIAN_C,
                           thresholdType, 21, 1);
+
+    // Show threshold image
     cv::imshow("Adaptive Thresh", thresholdImg);
     cv::waitKey(0);
 
     return thresholdImg;
 }
 
-cv::Mat ImageProcessing::preprocWithGauss2(const cv::Mat sourceImage, const int thresholdType)
+// Preprocessing for training image (Key feature: Digit contours)
+cv::Mat ImageProcessing::preprocWithGauss2(const cv::Mat trainingImage, const int thresholdType)
 {
     // Change image to greyscale
     cv::Mat greyscale;
-    cv::cvtColor(sourceImage, greyscale, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(trainingImage, greyscale, cv::COLOR_RGB2GRAY);
+
+    // Apply gaussian blurr (reduce noise)
     cv::Mat gaussBlurr;
     cv::GaussianBlur(greyscale, gaussBlurr, cv::Size(5, 5), 1, 1);
+
+    // Apply adaptive threshold
     cv::Mat thresholdImg;
     const double maxBinaryValue = 255;
     cv::adaptiveThreshold(gaussBlurr, thresholdImg, maxBinaryValue,
                           cv::ADAPTIVE_THRESH_GAUSSIAN_C,
                           thresholdType, 57, 17); // 57, 17
 
+    // Show threshold image
     // Plot adaptive threshold image
     // cv::imshow("Adaptive Thresh", thresholdImg);
     // cv::waitKey(0);
@@ -82,7 +89,7 @@ std::vector<cv::Point> ImageProcessing::getFrameContour(cv::Mat thresholdImg)
     // The largest contour area found in the image should be the frame of the sudoku
     double largest_area = 0;
     int index = -1;
-    for(int i = 0; i < int(cVector.size()); i++)
+    for(int i = 0; i < int(cVector.size()); ++i)
     {
         double contour_area = cv::contourArea(cVector[i]);
         if(contour_area > largest_area)
@@ -129,8 +136,6 @@ cv::Mat ImageProcessing::getTopView(const cv::Mat sourceImage, std::vector<cv::P
     const int imHeight = sourceImage.cols;
 
     // Define a vector holding the corners of the original image
-    //std::vector<cv::Point> imDimension = {cv::Point(imWidth,0), cv::Point(0,0),
-                                          //cv::Point(0, imHeight), cv::Point(imWidth, imHeight)};
     std::vector<cv::Point> imDimension = {cv::Point(0,0), cv::Point(0,imHeight),
                                           cv::Point(imWidth, imHeight), cv::Point(imWidth, 0)};
     // Apply perspective transform
@@ -149,9 +154,10 @@ std::vector<cv::Mat> ImageProcessing::extractCells(cv::Mat thresholdImg)
     int x0, y0, x1, y1;
     cv::Rect roi(0,0,0,0);
 
-    for(int i = 0; i < 9; i++)
+    // Extract region of interest (cell without boundaries --> reduces wrong digit detection)
+    for(int i = 0; i < 9; ++i)
     {
-        for(int j = 0; j < 9; j++)
+        for(int j = 0; j < 9; ++j)
         {
             x0 = j*cell_width+8;
             x1 = cell_width-10;
@@ -166,22 +172,19 @@ std::vector<cv::Mat> ImageProcessing::extractCells(cv::Mat thresholdImg)
 
 std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> cellImages)
 {
-    // TODO: return only cell images with digits
     std::vector<cv::Mat> cellImagesWithDigit;
     int cellCntr = 0;
-    std::vector<cv::Point> contourInCell;
 
     // Define parameters for "findContour" function
     std::vector<std::vector<cv::Point>> cVector;
-    //std::vector<cv::Vec4i> hierarchy;
 
+    // Loop through sudoku and extract resized image of cells that contain a digit
     std::for_each(cellImages.begin(), cellImages.end(), [&](cv::Mat cImg)
     {
        int tmp = cellCntr;
        cv::findContours(cImg, cVector, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
        for(auto &el : cVector)
        {
-           // std::cout << "Contour Area: " << cv::contourArea(el) << std::endl;
            if(cv::contourArea(el) > m_minContourArea && cv::contourArea(el) < m_maxContourArea)
            {               
                 cv::Rect boundingBox = cv::boundingRect(el);
@@ -189,22 +192,25 @@ std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> 
                 cv::Mat resizedCImg;
                 cv::resize(roiImg, resizedCImg, cv::Size(m_CellWidth, m_CellHeight));
                 cellImagesWithDigit.push_back(resizedCImg);
+                // Show cell that contain a number
                 // Check cell images:
                 // cv::imshow("Cell image with digit: ", resizedCImg);
                 // cv::waitKey(0);
-                cellsWithNumbers.push_back(true);
-                cellCntr++;
+                m_cellsWithNumbers.push_back(true);
+                ++cellCntr;
            }
        }
        if(cellCntr > tmp)
            tmp = cellCntr;
        else
-           cellsWithNumbers.push_back(false);
+           m_cellsWithNumbers.push_back(false);
+
        // Remove all contour elements from vector for next loop
        cVector.clear();
     });
 
-    for(auto el : cellsWithNumbers){
+    // Prints vector of boolean; True for cells with digits, False for empty cells
+    for(auto el : m_cellsWithNumbers){
         std::cout << el << " ";
     }
     std::cout << std::endl;
@@ -214,7 +220,7 @@ std::vector<cv::Mat> ImageProcessing::selectCellsWithDigit(std::vector<cv::Mat> 
 
 std::vector<bool> ImageProcessing::getCellsWithNumbers(void)
 {
-    return cellsWithNumbers;
+    return m_cellsWithNumbers;
 }
 
 void ImageProcessing::drawMissingDigits(cv::Mat topViewImage, const std::vector<bool> cellWithDigit, std::vector<int> sudoku)
@@ -234,7 +240,8 @@ void ImageProcessing::drawMissingDigits(cv::Mat topViewImage, const std::vector<
                    [](int digit){return std::to_string(digit);});
 
     std::vector<std::string>::iterator itr = missingDigits.begin();
-    // Draw the missing numbers to image
+
+    // Draw the missing numbers to image (size of digit is dependent on image size)
     std::for_each(cellWithDigit.begin(), cellWithDigit.end(), [&](bool cellContent){
         if(cellContent == false)
         {
@@ -246,7 +253,7 @@ void ImageProcessing::drawMissingDigits(cv::Mat topViewImage, const std::vector<
         if(colCounter == 8)
         {
             colCounter = -1;
-            rowCounter++;
+            ++rowCounter;
         }
         ++colCounter;
         ++itr;

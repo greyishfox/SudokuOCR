@@ -14,24 +14,26 @@
 class ImageProcessing
 {
 private:
-    // Holds contour of digit and coordinate in sudoku grid
+    // Member variables
     const int m_CellWidth = 20;
     const int m_CellHeight = 30;
     const int m_maxContourArea = 800;   // below this value we do not detect some digits
     const int m_minContourArea = 150;   // below this value, one digit might be recognized as two
-    std::vector<bool> cellsWithNumbers; // Assigns 'true' for digit and 'false' for emtpy cell
-    //std::vector<cv::Point> digitCoordinates; // Stores cell coordinates of missing numbers
+    std::vector<bool> m_cellsWithNumbers; // Assigns 'true' for digit and 'false' for emtpy cell
 
 public:
     ImageProcessing(); // Constructor
     ~ImageProcessing(); // Destructor
 
-    // Public member functions
+    /* ----------------------- Public member functions ----------------------- */
+    // Preprocessing for original image (Key feature: Outer contour of sudoku)
     cv::Mat imagePreprocessing(const cv::Mat sourceImage, const int thresholdType);
 
-    cv::Mat preprocWithGauss(const cv::Mat sourceImage, const int thresholdType);
+    // Preprocessing for transformed topview image (Key feature: Sudoku cells with numbers)
+    cv::Mat preprocWithGauss(const cv::Mat topView, const int thresholdType);
 
-    cv::Mat preprocWithGauss2(const cv::Mat sourceImage, const int thresholdType);
+    // Preprocessing for training image (Key feature: Digit contours)
+    cv::Mat preprocWithGauss2(const cv::Mat trainingImage, const int thresholdType);
 
     std::vector<cv::Point> getFrameContour(cv::Mat thresholdImg);
 

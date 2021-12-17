@@ -7,8 +7,9 @@
 class OCR
 {
 private:
-    cv::Mat classificationInputDigits;
-    cv::Mat trainingImageOutput;
+    // Member variables
+    cv::Mat m_classificationInputDigits;
+    cv::Mat m_trainingImageOutput;
     const std::string filename_class = "../SudokuOCR/src/classificationDigits.xml";
     const std::string filename_trained = "../SudokuOCR/src/trainedImages.xml";
     const int m_cellWidth = 20;
@@ -17,13 +18,19 @@ private:
     const int m_minContourArea = 60;
 
 public:
-    // OCR();   // No constructor needed
+    OCR(); // Constructor
+    ~OCR(); // Destructor
 
-    // Public member function
+    /* ----------------------- Public member functions ----------------------- */
     void getBoundingRect(cv::Mat trainingImage, cv::Mat thresholdImage, std::vector<std::vector<cv::Point>> cVector);
+
     void writeClassificationFile();
+
     void writeTrainedImageFile();
+
     bool checkIfFilesExists();
+
+    // Train the KNN algorithm and return a string with the detected digits
     std::string train(std::vector<cv::Mat> labelTrain);
 };
 

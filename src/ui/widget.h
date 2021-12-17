@@ -32,10 +32,10 @@ public slots:
 
 private:
     Ui::Widget *ui;
-    cv::Mat origImg;
-    cv::Mat solvedImg;
-    QImage displayOrigImage;
-    QImage displaySolvImage;
+    cv::Mat m_origImg;
+    cv::Mat m_solvedImg;
+    QImage m_displayOrigImage;
+    QImage m_displaySolvImage;
 
     ImageProcessing imgProcess;
     OCR myOCR;

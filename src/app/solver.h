@@ -14,9 +14,9 @@ class Solver
 private:
     // Member variables
     const int N = 9;
-    const int m_empty = 0;
+    const int m_EMPTY = 0;
 
-    // Member functions
+    /* ----------------------- Private member functions ----------------------- */
     bool rowChecker(std::vector<int> puzzle, const int row);
     bool colChecker(std::vector<int> puzzle, const int col);
     bool boxChecker(std::vector<int> puzzle, const int row, const int col);
@@ -27,6 +27,7 @@ public:
     Solver();   // Constructor
     ~Solver();  // Destructor
 
+    /* ----------------------- Public member functions ----------------------- */
     bool checker(const std::vector<int> puzzle, const int row, const int col);
     bool solve(std::vector<int>& puzzle, int row, int col);
     void printSudoku(std::vector<int> sudoku);

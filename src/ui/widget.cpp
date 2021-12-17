@@ -23,28 +23,29 @@ void Widget::plotOrigImg()
     // Read in the image which is selected in the combo box
     std::cout << ui->comboBox->currentText().toStdString() << std::endl;
     if(ui->comboBox->currentText().toStdString() == "Sudoku Puzzle 01")
-        origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image1.jpg");
+        m_origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image1.jpg");
     else if(ui->comboBox->currentText().toStdString() == "Sudoku Puzzle 02")
-        origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image2.jpg");
+        m_origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image2.jpg");
     else if(ui->comboBox->currentText().toStdString() == "Sudoku Puzzle 03")
-        origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image3.jpg");
+        m_origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image3.jpg");
     else if(ui->comboBox->currentText().toStdString() == "Sudoku Puzzle 04")
-        origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image4.jpg");
+        m_origImg = cv::imread("../SudokuOCR/img/sudoku_sample_image4.jpg");
     else if(ui->comboBox->currentText().toStdString() == "Worlds Hardest Sudoku")
-        origImg = cv::imread("../SudokuOCR/img/worldsHardestSudoku.png");
+        m_origImg = cv::imread("../SudokuOCR/img/worldsHardestSudoku.png");
 
     // Check if image was successfully loaded
-    if(origImg.empty())
+    if(m_origImg.empty())
     {
         std::cout << "Error, Image not found!" << std::endl;
         exit(1);
     }
     else
     {
-        cv::resize(origImg, origImg, cv::Size(512, 481), 0, 0, cv::INTER_LINEAR);
-        displayOrigImage = QImage((const unsigned char*) (origImg.data), origImg.cols,
-                                  origImg.rows, origImg.step, QImage::Format_RGB888);
-        ui->lbl_origImg->setPixmap(QPixmap::fromImage(displayOrigImage));
+        // Resize the image and plot it using Pixmap
+        cv::resize(m_origImg, m_origImg, cv::Size(512, 481), 0, 0, cv::INTER_LINEAR);
+        m_displayOrigImage = QImage((const unsigned char*) (m_origImg.data), m_origImg.cols,
+                                  m_origImg.rows, m_origImg.step, QImage::Format_RGB888);
+        ui->lbl_origImg->setPixmap(QPixmap::fromImage(m_displayOrigImage));
     }
 }
 
@@ -53,20 +54,22 @@ void Widget::plotSolvImg()
     // Get time at solver start
     auto start = std::chrono::high_resolution_clock::now();
 
-    if(origImg.empty())
+    // Exit if no image is loaded
+    if(m_origImg.empty())
     {
         std::cout << "Error, Image not found!" << std::endl;
         exit(1);
     }
     else
     {
-        cv::Mat thresholdImg = imgProcess.imagePreprocessing(origImg, cv::THRESH_BINARY_INV);
+        // Image processing on Sudoku picture
+        cv::Mat thresholdImg = imgProcess.imagePreprocessing(m_origImg, cv::THRESH_BINARY_INV);
 
         std::vector<cv::Point> frameContour = imgProcess.getFrameContour(thresholdImg);
 
-        std::vector<cv::Point> frameCorners = imgProcess.findFrameCorners(origImg, frameContour);
+        std::vector<cv::Point> frameCorners = imgProcess.findFrameCorners(m_origImg, frameContour);
 
-        cv::Mat topView = imgProcess.getTopView(origImg, frameCorners);
+        cv::Mat topView = imgProcess.getTopView(m_origImg, frameCorners);
 
         cv::Mat newThresholdImg = imgProcess.preprocWithGauss2(topView, cv::THRESH_BINARY_INV);
         std::vector<cv::Mat> cellImages = imgProcess.extractCells(newThresholdImg);
@@ -113,7 +116,7 @@ void Widget::plotSolvImg()
         int row = 0;
         int col = 0;
 
-        // Perform the algorithm
+        // Perform the algorithm --> Backtracking
         if(mysolver.solve(puzzleToSolve, row, col))
         {
             if(mysolver.checker(puzzleToSolve, row, col))
@@ -130,11 +133,11 @@ void Widget::plotSolvImg()
         imgProcess.drawMissingDigits(topView, imgProcess.getCellsWithNumbers(), puzzleToSolve);
 
         // Print solved Sudoku image
-        displaySolvImage = QImage((const unsigned char*) (topView.data),topView.cols,
+        m_displaySolvImage = QImage((const unsigned char*) (topView.data),topView.cols,
                                   topView.rows, topView.step, QImage::Format_RGB888);
-        ui->lbl_solvImg->setPixmap(QPixmap::fromImage(displaySolvImage));
+        ui->lbl_solvImg->setPixmap(QPixmap::fromImage(m_displaySolvImage));
 
-        solvedImg = topView.clone();
+        m_solvedImg = topView.clone();
     }
 
     // Get time at solver ending
@@ -146,7 +149,7 @@ void Widget::plotSolvImg()
 
 void Widget::saveImg()
 {
-    if(solvedImg.empty())
+    if(m_solvedImg.empty())
     {
         std::cout << "Error, Image not found!" << std::endl;
         exit(1);
@@ -170,18 +173,18 @@ void Widget::saveImg()
 
     // Check concatenated file name
     saveFileName = saveDir + timeStamp + fileName;
-    qDebug() << "Save file name is: " << saveFileName;
+    qDebug() << "Image saved as: " << saveFileName;
 
-    cv::imwrite(saveFileName.toStdString(), solvedImg);
+    cv::imwrite(saveFileName.toStdString(), m_solvedImg);
 }
 
 void Widget::reset()
 {
     // Reset member variables and clear labels
-    origImg.release();
-    solvedImg.release();
-    displayOrigImage = QImage();
-    displaySolvImage = QImage();
+    m_origImg.release();
+    m_solvedImg.release();
+    m_displayOrigImage = QImage();
+    m_displaySolvImage = QImage();
     ui->lbl_origImg->clear();
     ui->lbl_solvImg->clear();
 

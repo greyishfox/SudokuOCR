@@ -1,5 +1,9 @@
 #include "ocr.h"
 
+OCR::OCR(){}
+
+OCR::~OCR(){}
+
 void OCR::getBoundingRect(cv::Mat trainingImage, cv::Mat thresholdImage, std::vector<std::vector<cv::Point>> cVector)
 {
     cv::Mat roiImage;
@@ -8,10 +12,10 @@ void OCR::getBoundingRect(cv::Mat trainingImage, cv::Mat thresholdImage, std::ve
     int cntr = 0;
     std::vector<int> validDigits = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-    if(!classificationInputDigits.empty())
-        classificationInputDigits.release();
-    if(!trainingImageOutput.empty())
-        trainingImageOutput.release();
+    if(!m_classificationInputDigits.empty())
+        m_classificationInputDigits.release();
+    if(!m_trainingImageOutput.empty())
+        m_trainingImageOutput.release();
 
     for(auto& el : cVector)
     {
@@ -33,11 +37,11 @@ void OCR::getBoundingRect(cv::Mat trainingImage, cv::Mat thresholdImage, std::ve
             //if(inputDigit >= '0' && inputDigit <= '9')
             if(std::any_of(validDigits.begin(), validDigits.end(), [&inputDigit](int x) {return (x == inputDigit);}))
             {
-                classificationInputDigits.push_back(inputDigit);
+                m_classificationInputDigits.push_back(inputDigit);
                 cv::Mat floatImg;
                 resizedRoiImage.convertTo(floatImg, CV_32FC1);
                 cv::Mat flattenedImg = floatImg.reshape(1, 1);
-                trainingImageOutput.push_back(flattenedImg);
+                m_trainingImageOutput.push_back(flattenedImg);
             }
         }
     }
@@ -48,8 +52,8 @@ void OCR::writeClassificationFile()
 {
     // Convert the classification numbers to float --> required for KNN algorithm
     cv::Mat classificationInputToFloat;
-    classificationInputDigits.convertTo(classificationInputToFloat, CV_32FC1);
-    classificationInputDigits.release();
+    m_classificationInputDigits.convertTo(classificationInputToFloat, CV_32FC1);
+    m_classificationInputDigits.release();
     // Create a classification file in ".xml" format ...
     cv::FileStorage fs_class(filename_class, cv::FileStorage::WRITE);
 
@@ -67,8 +71,8 @@ void OCR::writeTrainedImageFile()
     cv::FileStorage fs_images(filename_trained, cv::FileStorage::WRITE);
 
     // ... store the images used in user decision making as float data types ...
-    fs_images << "trainedImages" << trainingImageOutput;
-    trainingImageOutput.release();
+    fs_images << "trainedImages" << m_trainingImageOutput;
+    m_trainingImageOutput.release();
     // ... and close the file
     fs_images.release();
 }

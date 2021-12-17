@@ -83,9 +83,9 @@ bool Solver::boxChecker(std::vector<int> puzzle, const int row, const int col)
         std::vector<int>::iterator it = puzzle.begin() + (firstRow*N + firstCol);
 
         // store values from subsquare in vector
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < 3; ++i)
         {
-            for(int j = 0; j < 3; j++)
+            for(int j = 0; j < 3; ++j)
             {
                 subSquare.push_back(*(it+j));
             }
@@ -101,7 +101,6 @@ bool Solver::boxChecker(std::vector<int> puzzle, const int row, const int col)
             uniqueNum_flag = true;
     }
 
-    // std::cout << "The square is: " << (validNum_flag && uniqueNum_flag) << std::endl;
     return validNum_flag && uniqueNum_flag;
 }
 
@@ -129,7 +128,7 @@ bool Solver::selectionChecker(std::vector<int> puzzle, const int row, const int 
     std::vector<int>::iterator it = puzzle.begin() + (row * N);
     std::vector<int>::iterator const selected = puzzle.begin() + (row * N + col);
 
-    for(int i = 0; i < N; i++)
+    for(int i = 0; i < N; ++i)
     {
         if(*it == *selected && it != selected)
             return false;
@@ -139,7 +138,7 @@ bool Solver::selectionChecker(std::vector<int> puzzle, const int row, const int 
     /* 2) Check if number is unique in col */
     it = puzzle.begin() + col;
 
-    for(int i = 0; i < N; i++)
+    for(int i = 0; i < N; ++i)
     {
         if(*it == *selected && it != selected)
             return false;
@@ -154,9 +153,9 @@ bool Solver::selectionChecker(std::vector<int> puzzle, const int row, const int 
     it = puzzle.begin() + (firstRow*N + firstCol);
 
     // store values from subsquare in vector
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 3; ++i)
     {
-        for(int j = 0; j < 3; j++)
+        for(int j = 0; j < 3; ++j)
         {
             if(*it == *selected && it != selected)
                 return false;
@@ -173,14 +172,14 @@ bool Solver::findNextEmptyCell(std::vector<int> puzzle, int &row, int &col)
     std::vector<int>::iterator it = puzzle.begin() + (row*N)+col;
     while(it < puzzle.end())
     {
-        if(*it == m_empty)
+        if(*it == m_EMPTY)
         {
             row = std::distance(puzzle.begin(),it) / N;
             col = std::distance(puzzle.begin(),it) % N;
             return true;
         }
         else
-            it++;
+            ++it;
     }
     return false;
 }
@@ -222,7 +221,7 @@ bool Solver::solve(std::vector<int> &puzzle, int row, int col)
     /* 2) if the last col is exceeded (== 9), jump to next row (++) and reset col (=0) */
     if(col == N)
     {
-        row++;
+        ++row;
         col = 0;
     }
 
@@ -233,7 +232,7 @@ bool Solver::solve(std::vector<int> &puzzle, int row, int col)
     // 4) Try numbers 1-9 for x and keep if the selection is valid
     std::vector<int>::iterator it;
     int index = 0;
-    for(int x = 1; x <= N; x++)
+    for(int x = 1; x <= N; ++x)
     {
         index = (row * N) + col;
         puzzle[index] = x;
@@ -243,15 +242,16 @@ bool Solver::solve(std::vector<int> &puzzle, int row, int col)
             if(solve(puzzle, row, col))
                 return true;
             // Numbers that did not lead to a solution are set back to empty ('0')
-            puzzle[index] = m_empty;
+            puzzle[index] = m_EMPTY;
         }
         else
-            puzzle[index] = m_empty;
+            puzzle[index] = m_EMPTY;
     }
     // No suitable selection found
     return false;
 }
 
+// Print the sudoku to terminal
 void Solver::printSudoku(std::vector<int> sudoku)
 {
     std::vector<int>::iterator itr = sudoku.begin();
