@@ -19,8 +19,8 @@ cv::Mat ImageProcessing::imagePreprocessing(const cv::Mat sourceImage, const int
     cv::threshold(greyscale, thresholdImg, thresholdValue, maxBinaryValue, thresholdType);
 
     // Plot threshold image
-    cv::imshow("Threshold image", thresholdImg);
-    cv::waitKey(0);
+    // cv::imshow("Threshold image", thresholdImg);
+    // cv::waitKey(0);
 
     // Return a treshold version of the original image
     return thresholdImg;
@@ -45,8 +45,8 @@ cv::Mat ImageProcessing::preprocWithGauss(const cv::Mat topView, const int thres
                           thresholdType, 21, 1);
 
     // Show threshold image
-    cv::imshow("Adaptive Thresh", thresholdImg);
-    cv::waitKey(0);
+    // cv::imshow("Adaptive Thresh", thresholdImg);
+    // cv::waitKey(0);
 
     return thresholdImg;
 }
@@ -117,10 +117,10 @@ std::vector<cv::Point> ImageProcessing::findFrameCorners(cv::Mat sourceImage, st
         std::cout << "Frame corners found!" << std::endl;
 
         // Plot grid corners
-        cv::Mat poly_img = sourceImage.clone();
-        cv::drawContours(poly_img, cv::Mat(polygon), -1, cv::Scalar(0, 0, 255), 3, 8);
-        cv::imshow("Corner image", poly_img);
-        cv::waitKey(0);
+        // cv::Mat poly_img = sourceImage.clone();
+        // cv::drawContours(poly_img, cv::Mat(polygon), -1, cv::Scalar(0, 0, 255), 3, 8);
+        // cv::imshow("Corner image", poly_img);
+        // cv::waitKey(0);
     }
     else
         std::cout << "Error: Contour has more than 4 corners!" << std::endl;
@@ -142,6 +142,10 @@ cv::Mat ImageProcessing::getTopView(const cv::Mat sourceImage, std::vector<cv::P
     cv::Mat perspective = cv::findHomography(frameCorners, imDimension, cv::RANSAC);
     cv::Mat topViewImage;
     cv::warpPerspective(sourceImage, topViewImage, perspective, cv::Size(imWidth,imHeight));
+
+    // Print topview
+    // cv::imshow("Top View image", topViewImage);
+    // cv::waitKey(0);
 
     return topViewImage;
 }
@@ -165,6 +169,10 @@ std::vector<cv::Mat> ImageProcessing::extractCells(cv::Mat thresholdImg)
             y1 = cell_height-10;
             roi = cv::Rect(x0, y0, x1, y1);
             allCellImages.push_back(thresholdImg(roi));
+
+            // Show extracted cell
+            // cv::imshow("digit", thresholdImg(roi));
+            // cv::waitKey(0);
         }
     }
     return allCellImages;
