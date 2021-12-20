@@ -11,6 +11,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->btn_solution, SIGNAL(clicked()), this, SLOT(plotSolvImg()));
     connect(ui->btn_save, SIGNAL(clicked()), this, SLOT(saveImg()));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(reset()));
+    this->setFixedSize(1050,781);
 }
 
 Widget::~Widget()
